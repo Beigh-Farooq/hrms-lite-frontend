@@ -21,6 +21,7 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,14 +35,47 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    setFieldErrors({});
     setLoading(true);
+
+    // Client-side validation
+    const errors = {};
+    if (!form.employee_id) {
+      errors.employee_id = "Select Employee is required";
+    }
+    if (!form.date) {
+      errors.date = "Date is required";
+    }
+    if (!form.status) {
+      errors.status = "Status is required";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      setLoading(false);
+      return;
+    }
 
     try {
       await markAttendance(form);
       onEmployeeChange(form.employee_id); // reload full history
     } catch (err) {
-      setError(err.response?.data?.detail || "Failed to mark attendance");
+      if (err.response?.status === 422 && err.response?.data?.detail) {
+        // Handle Pydantic validation errors
+        const validationErrors = err.response.data.detail;
+        if (Array.isArray(validationErrors)) {
+          const errors = {};
+          validationErrors.forEach(error => {
+            const field = error.loc[1]; // Assuming loc is ['body', 'field_name']
+            errors[field] = error.msg;
+          });
+          setFieldErrors(errors);
+        } else {
+          setFieldErrors({ general: err.response.data.detail });
+        }
+      } else {
+        setFieldErrors({ general: err.response?.data?.detail || "Failed to mark attendance" });
+      }
     } finally {
       setLoading(false);
     }
@@ -53,10 +87,10 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
         Mark Attendance
       </Typography>
 
-      {error && <Alert severity="error">{error}</Alert>}
+      {fieldErrors.general && <Alert severity="error">{fieldErrors.general}</Alert>}
 
       <Stack spacing={2} mt={2}>
-        <FormControl fullWidth required>
+        <FormControl fullWidth required error={!!fieldErrors.employee_id}>
           <InputLabel>Employee</InputLabel>
           <Select
             name="employee_id"
@@ -70,6 +104,7 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
               </MenuItem>
             ))}
           </Select>
+          {fieldErrors.employee_id && <Typography variant="caption" color="error">{fieldErrors.employee_id}</Typography>}
         </FormControl>
 
         <TextField
@@ -80,9 +115,11 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
           value={form.date}
           onChange={handleChange}
           required
+          error={!!fieldErrors.date}
+          helperText={fieldErrors.date}
         />
 
-        <FormControl fullWidth>
+        <FormControl fullWidth error={!!fieldErrors.status}>
           <InputLabel>Status</InputLabel>
           <Select
             name="status"
@@ -93,6 +130,7 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
             <MenuItem value="Present">Present</MenuItem>
             <MenuItem value="Absent">Absent</MenuItem>
           </Select>
+          {fieldErrors.status && <Typography variant="caption" color="error">{fieldErrors.status}</Typography>}
         </FormControl>
 
         <Button
