@@ -1,32 +1,47 @@
+import {
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Button,
+  Paper,
+} from "@mui/material";
+
 export default function EmployeeTable({ employees, onDelete }) {
-  if (!employees.length) {
-    return <p>No employees found.</p>;
-  }
+  if (!employees.length) return <p>No employees found.</p>;
 
   return (
-    <table border="1" cellPadding="8">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Department</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        {employees.map((emp) => (
-          <tr key={emp.id}>
-            <td>{emp.employee_id}</td>
-            <td>{emp.full_name}</td>
-            <td>{emp.email}</td>
-            <td>{emp.department}</td>
-            <td>
-              <button onClick={() => onDelete(emp.employee_id)}>Delete</button>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>ID</TableCell>
+            <TableCell>Name</TableCell>
+            <TableCell>Email</TableCell>
+            <TableCell>Department</TableCell>
+            <TableCell>Action</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {employees.map((emp) => (
+            <TableRow key={emp.id}>
+              <TableCell>{emp.employee_id}</TableCell>
+              <TableCell>{emp.full_name}</TableCell>
+              <TableCell>{emp.email}</TableCell>
+              <TableCell>{emp.department}</TableCell>
+              <TableCell>
+                <Button
+                  color="error"
+                  onClick={() => onDelete(emp.employee_id)}
+                >
+                  Delete
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </Paper>
   );
 }

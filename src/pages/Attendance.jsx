@@ -1,46 +1,45 @@
 import { useEffect, useState } from "react";
-import { getEmployees } from "../services/employeeService";
-import { getAttendance } from "../services/attendanceService";
+import { Typography, CircularProgress } from "@mui/material";
 import AttendanceForm from "../components/AttendanceForm";
 import AttendanceTable from "../components/AttendanceTable";
+import { getEmployees } from "../services/employeeService";
+import { getAttendance } from "../services/attendanceService";
 
 export default function Attendance() {
   const [employees, setEmployees] = useState([]);
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [selectedEmployee, setSelectedEmployee] = useState("");
 
   useEffect(() => {
     getEmployees().then((res) => setEmployees(res.data));
   }, []);
 
   const loadAttendance = async (employeeId) => {
-  try {
-    setSelectedEmployee(employeeId);
-    setLoading(true);
-    const res = await getAttendance(employeeId);
-    setRecords(res.data.records);
-  } catch {
-    setError("Failed to load attendance");
-  } finally {
-    setLoading(false);
-  }
-};
+    if (!employeeId) return;
+
+    try {
+      setLoading(true);
+      const res = await getAttendance(employeeId);
+      setRecords(res.data.records);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
-      <h2>Attendance Management</h2>
+     
 
       <AttendanceForm
         employees={employees}
-        onSuccess={loadAttendance}
+        onEmployeeChange={loadAttendance}
       />
 
-      {loading && <p>Loading attendance...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {!loading && <AttendanceTable records={records} />}
+      {loading ? (
+        <CircularProgress />
+      ) : (
+        <AttendanceTable records={records} />
+      )}
     </div>
   );
 }

@@ -31,8 +31,6 @@ export default function Employees() {
 
   return (
     <div>
-      <h2>Employee Management</h2>
-
       <EmployeeForm onSuccess={loadEmployees} />
 
       {loading && <p>Loading...</p>}

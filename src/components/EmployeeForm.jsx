@@ -1,4 +1,12 @@
 import { useState } from "react";
+import {
+  TextField,
+  Button,
+  Stack,
+  Alert,
+  Paper,
+  Typography,
+} from "@mui/material";
 import { createEmployee } from "../services/employeeService";
 
 export default function EmployeeForm({ onSuccess }) {
@@ -11,15 +19,13 @@ export default function EmployeeForm({ onSuccess }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       await createEmployee(form);
       setForm({ employee_id: "", full_name: "", email: "", department: "" });
@@ -32,19 +38,23 @@ export default function EmployeeForm({ onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Add Employee</h3>
+    <Paper sx={{p: 3,mb: 3,width: "100%"}}>
+      <Typography variant="h6" gutterBottom>
+        Add Employee
+      </Typography>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <Alert severity="error">{error}</Alert>}
 
-      <input name="employee_id" placeholder="Employee ID" value={form.employee_id} onChange={handleChange} required />
-      <input name="full_name" placeholder="Full Name" value={form.full_name} onChange={handleChange} required />
-      <input name="email" placeholder="Email" value={form.email} onChange={handleChange} required />
-      <input name="department" placeholder="Department" value={form.department} onChange={handleChange} required />
+      <Stack spacing={2} mt={2}>
+        <TextField label="Employee ID" name="employee_id" value={form.employee_id} onChange={handleChange} required />
+        <TextField label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} required />
+        <TextField label="Email" name="email" value={form.email} onChange={handleChange} required />
+        <TextField label="Department" name="department" value={form.department} onChange={handleChange} required />
 
-      <button disabled={loading}>
-        {loading ? "Saving..." : "Add Employee"}
-      </button>
-    </form>
+        <Button variant="contained" disabled={loading} onClick={handleSubmit}>
+          {loading ? "Saving..." : "Add Employee"}
+        </Button>
+      </Stack>
+    </Paper>
   );
 }

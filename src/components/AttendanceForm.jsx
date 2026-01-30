@@ -1,7 +1,19 @@
 import { useState } from "react";
+import {
+  Paper,
+  Typography,
+  Stack,
+  Button,
+  Alert,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@mui/material";
 import { markAttendance } from "../services/attendanceService";
 
-export default function AttendanceForm({ employees, onSuccess }) {
+export default function AttendanceForm({ employees, onEmployeeChange }) {
   const [form, setForm] = useState({
     employee_id: "",
     date: "",
@@ -11,7 +23,13 @@ export default function AttendanceForm({ employees, onSuccess }) {
   const [error, setError] = useState("");
 
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    // Auto-load attendance when employee changes
+    if (name === "employee_id") {
+      onEmployeeChange(value);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -21,7 +39,7 @@ export default function AttendanceForm({ employees, onSuccess }) {
 
     try {
       await markAttendance(form);
-      onSuccess(form.employee_id);
+      onEmployeeChange(form.employee_id); // reload full history
     } catch (err) {
       setError(err.response?.data?.detail || "Failed to mark attendance");
     } finally {
@@ -30,44 +48,61 @@ export default function AttendanceForm({ employees, onSuccess }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Mark Attendance</h3>
+    <Paper sx={{p: 3,mb: 3,width: "100%"}}>
+      <Typography variant="h6" gutterBottom>
+        Mark Attendance
+      </Typography>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <Alert severity="error">{error}</Alert>}
 
-      <select
-        name="employee_id"
-        value={form.employee_id}
-        onChange={(e) => {
-            handleChange(e);
-            onSuccess(e.target.value);
-        }}
-        required
-      >
-        <option value="">Select Employee</option>
-        {employees.map((emp) => (
-          <option key={emp.id} value={emp.employee_id}>
-            {emp.full_name} ({emp.employee_id})
-          </option>
-        ))}
-      </select>
+      <Stack spacing={2} mt={2}>
+        <FormControl fullWidth required>
+          <InputLabel>Employee</InputLabel>
+          <Select
+            name="employee_id"
+            value={form.employee_id}
+            label="Employee"
+            onChange={handleChange}
+          >
+            {employees.map((emp) => (
+              <MenuItem key={emp.id} value={emp.employee_id}>
+                {emp.full_name} ({emp.employee_id})
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      <input
-        type="date"
-        name="date"
-        value={form.date}
-        onChange={handleChange}
-        required
-      />
+        <TextField
+          type="date"
+          name="date"
+          label="Date"
+          InputLabelProps={{ shrink: true }}
+          value={form.date}
+          onChange={handleChange}
+          required
+        />
 
-      <select name="status" value={form.status} onChange={handleChange}>
-        <option value="Present">Present</option>
-        <option value="Absent">Absent</option>
-      </select>
+        <FormControl fullWidth>
+          <InputLabel>Status</InputLabel>
+          <Select
+            name="status"
+            value={form.status}
+            label="Status"
+            onChange={handleChange}
+          >
+            <MenuItem value="Present">Present</MenuItem>
+            <MenuItem value="Absent">Absent</MenuItem>
+          </Select>
+        </FormControl>
 
-      <button disabled={loading}>
-        {loading ? "Saving..." : "Submit"}
-      </button>
-    </form>
+        <Button
+          variant="contained"
+          disabled={loading}
+          onClick={handleSubmit}
+        >
+          {loading ? "Saving..." : "Submit Attendance"}
+        </Button>
+      </Stack>
+    </Paper>
   );
 }
