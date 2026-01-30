@@ -8,6 +8,7 @@ import {
   Chip,
   Typography,
   Box,
+  TableContainer,
 } from "@mui/material";
 
 export default function AttendanceTable({ records }) {
@@ -21,28 +22,30 @@ export default function AttendanceTable({ records }) {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Date</TableCell>
-            <TableCell>Status</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {records.map((rec) => (
-            <TableRow key={rec.id}>
-              <TableCell>{rec.date}</TableCell>
-              <TableCell>
-                <Chip
-                  label={rec.status}
-                  color={rec.status === "Present" ? "success" : "error"}
-                  size="small"
-                />
-              </TableCell>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Status</TableCell>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHead>
+          <TableBody>
+            {records.map((rec) => (
+              <TableRow key={rec.id}>
+                <TableCell>{rec.date}</TableCell>
+                <TableCell>
+                  <Chip
+                    label={rec.status}
+                    color={rec.status === "Present" ? "success" : "error"}
+                    size="small"
+                  />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </Paper>
   );
 }
