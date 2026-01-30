@@ -38,7 +38,7 @@ export default function EmployeeForm({ onSuccess }) {
   };
 
   return (
-    <Paper sx={{p: 3,mb: 3,width: "100%"}}>
+    <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" gutterBottom>
         Add Employee
       </Typography>

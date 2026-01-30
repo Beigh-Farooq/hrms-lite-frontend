@@ -9,13 +9,13 @@ export default function MainLayout() {
   return (
     // <Box sx={{ width: "100%", p: { xs: 2, md: 4 }}}>
     <Box
-    sx={{
-        width: "100%",
-        maxWidth: "1200px",
-        mx: "auto",        // centers content
-        px: { xs: 2, md: 3 }, // equal left & right padding
+      sx={{
+        // maxWidth: "1200px",
+        mx: "auto",                 // centers content
+        px: { xs: 2, md: 3 },       // equal left & right padding
         py: 3,
-    }}
+        overflowX: "hidden",        // ✅ prevents horizontal scroll
+      }}
     >
       <Typography variant="h4" gutterBottom>
         HRMS Lite

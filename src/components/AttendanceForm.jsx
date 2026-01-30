@@ -48,7 +48,7 @@ export default function AttendanceForm({ employees, onEmployeeChange }) {
   };
 
   return (
-    <Paper sx={{p: 3,mb: 3,width: "100%"}}>
+    <Paper sx={{ p: 3, mb: 3 }}>
       <Typography variant="h6" gutterBottom>
         Mark Attendance
       </Typography>
