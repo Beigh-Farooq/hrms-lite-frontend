@@ -38,7 +38,10 @@ export default function AttendanceForm({ employees, onSuccess }) {
       <select
         name="employee_id"
         value={form.employee_id}
-        onChange={handleChange}
+        onChange={(e) => {
+            handleChange(e);
+            onSuccess(e.target.value);
+        }}
         required
       >
         <option value="">Select Employee</option>

@@ -9,22 +9,24 @@ export default function Attendance() {
   const [records, setRecords] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [selectedEmployee, setSelectedEmployee] = useState("");
 
   useEffect(() => {
     getEmployees().then((res) => setEmployees(res.data));
   }, []);
 
   const loadAttendance = async (employeeId) => {
-    try {
-      setLoading(true);
-      const res = await getAttendance(employeeId);
-      setRecords(res.data.records);
-    } catch {
-      setError("Failed to load attendance");
-    } finally {
-      setLoading(false);
-    }
-  };
+  try {
+    setSelectedEmployee(employeeId);
+    setLoading(true);
+    const res = await getAttendance(employeeId);
+    setRecords(res.data.records);
+  } catch {
+    setError("Failed to load attendance");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div>
